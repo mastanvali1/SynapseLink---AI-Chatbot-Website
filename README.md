@@ -1,5 +1,7 @@
 # 🔗 SynapseLink - AI Conversation Partner
 
+![SynapseLink Thumbnail](./assets/chatbot.png)
+
 A stunning, futuristic AI chatbot built with a glassmorphic design and powered by Google's Gemini API. Secure, responsive, and animated for a premium user experience.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://synapse-link-ai-chatbot.vercel.app/)
