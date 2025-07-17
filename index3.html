@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexusAI Conversa - Intelligent AI Chatbot</title>
+    <meta name="description" content="Engage in intelligent conversations with NexusAI Conversa, a futuristic chatbot powered by Google's Gemini AI.">
+    <meta name="keywords" content="AI, chatbot, NexusAI, Conversa, Gemini, Google AI, machine learning, conversational AI">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Custom Styles for Glassmorphism, Animations, and Chat UI -->
+    <style>
+        /* Base styles for the body */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0f1f; /* Deep blue dark background */
+            color: #e0e0e0;
+            overflow-x: hidden;
+        }
+
+        /* Animated background canvas */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.5;
+        }
+
+        /* Glassmorphism effect */
+        .glassmorphic {
+            background: rgba(10, 15, 31, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Header scroll effect */
+        .header-scrolled {
+            background: rgba(10, 15, 31, 0.8);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+        }
+
+        /* Neon accent color */
+        .neon-cyan { color: #00FFFF; }
+        .neon-cyan-bg { background-color: #00FFFF; }
+        .neon-cyan-border { border-color: #00FFFF; }
+        .neon-cyan-shadow { box-shadow: 0 0 5px #00FFFF, 0 0 15px #00FFFF, 0 0 25px #00FFFF; }
+
+        /* Reveal on scroll animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+        
+        /* Chat bubble styling */
+        .chat-bubble {
+            max-width: 75%;
+            padding: 12px 18px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: slide-in 0.5s forwards;
+            word-wrap: break-word;
+        }
+        .chat-bubble.user {
+            background-color: #00FFFF;
+            color: #0a0f1f;
+            border-bottom-right-radius: 5px;
+            align-self: flex-end;
+        }
+        .chat-bubble.ai {
+            background-color: #1e293b;
+            color: #e0e0e0;
+            border-bottom-left-radius: 5px;
+            align-self: flex-start;
+        }
+
+        /* Typing indicator animation */
+        .typing-indicator span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #9ca3af;
+            margin: 0 2px;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1.0); } }
+        @keyframes slide-in { to { opacity: 1; transform: translateY(0); } }
+
+        /* Hamburger Menu */
+        .hamburger { display: block; cursor: pointer; }
+        .hamburger-line {
+            width: 30px;
+            height: 3px;
+            background-color: white;
+            margin: 6px 0;
+            transition: all 0.4s ease-in-out;
+        }
+        .hamburger.active .hamburger-line:nth-child(1) { transform: rotate(-45deg) translate(-7px, 7px); }
+        .hamburger.active .hamburger-line:nth-child(2) { opacity: 0; }
+        .hamburger.active .hamburger-line:nth-child(3) { transform: rotate(45deg) translate(-7px, -7px); }
+
+        /* Mobile Nav Menu */
+        #mobile-nav {
+            transform: translateX(100%);
+            transition: transform 0.4s ease-in-out;
+        }
+        #mobile-nav.active { transform: translateX(0); }
+
+        /* Hide content until authenticated */
+        .requires-auth { display: none; }
+        body.authenticated .requires-auth { display: block; } /* Use 'block' or 'flex' as appropriate */
+        body.authenticated #chatbot { display: block; }
+        body.authenticated #auth-button-container .login-btn,
+        body.authenticated #auth-button-container-mobile .login-btn { display: none; }
+        
+        body.authenticated #auth-button-container .logout-btn,
+        body.authenticated #auth-button-container-mobile .logout-btn { display: block; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
+        <div class="glassmorphic p-8 rounded-2xl w-full max-w-sm text-center">
+            <h2 class="text-3xl font-bold text-white mb-2">Welcome Back</h2>
+            <p class="text-gray-400 mb-6">Login to access NexusAI Conversa</p>
+            <form id="login-form">
+                <input type="text" id="username" placeholder="Username (hint: demo)" class="w-full bg-gray-800 text-white rounded-full py-3 px-5 mb-4 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                <input type="password" id="password" placeholder="Password (hint: password123)" class="w-full bg-gray-800 text-white rounded-full py-3 px-5 mb-6 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                <button type="submit" class="w-full px-8 py-3 bg-cyan-500 text-black font-bold rounded-full text-lg transform hover:scale-105 hover:neon-cyan-shadow transition-all duration-300">
+                    Login
+                </button>
+                <p id="login-error" class="text-red-500 mt-4 h-4"></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirm-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 items-center justify-center z-50">
+        <div class="glassmorphic p-8 rounded-2xl w-full max-w-sm text-center">
+            <h2 class="text-2xl font-bold text-white mb-4">Are you sure?</h2>
+            <p class="text-gray-400 mb-6">Clearing the chat history cannot be undone.</p>
+            <div class="flex justify-center space-x-4">
+                <button id="confirm-cancel-btn" class="px-8 py-3 bg-gray-600 text-white font-bold rounded-full hover:bg-gray-700 transition-all">Cancel</button>
+                <button id="confirm-action-btn" class="px-8 py-3 bg-red-500 text-white font-bold rounded-full hover:bg-red-600 transition-all">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Animated Particle Background -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- Header Section -->
+    <header id="main-header" class="fixed top-0 left-0 right-0 z-40 transition-all duration-300 glassmorphic">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-2xl font-bold text-white tracking-wider">
+                NexusAI<span class="neon-cyan">Conversa</span>
+            </div>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="#home" class="text-gray-300 hover:neon-cyan transition-colors duration-300">Home</a>
+                <a href="#chatbot" class="text-gray-300 hover:neon-cyan transition-colors duration-300">Chatbot</a>
+                <a href="#features" class="text-gray-300 hover:neon-cyan transition-colors duration-300">Features</a>
+                <a href="#about" class="text-gray-300 hover:neon-cyan transition-colors duration-300">About</a>
+            </div>
+            <div id="auth-button-container" class="hidden md:block">
+                <button class="login-btn px-5 py-2 bg-transparent border-2 neon-cyan-border rounded-full text-white font-semibold hover:bg-cyan-400 hover:text-black hover:neon-cyan-shadow transition-all duration-300 transform hover:scale-105">Login</button>
+                <button class="logout-btn hidden px-5 py-2 bg-red-500 border-2 border-red-500 rounded-full text-white font-semibold hover:bg-red-600 transition-all duration-300 transform hover:scale-105">Logout</button>
+            </div>
+            <!-- Hamburger Menu Button -->
+            <div class="md:hidden">
+                <button id="hamburger-button" class="hamburger">
+                    <div class="hamburger-line"></div>
+                    <div class="hamburger-line"></div>
+                    <div class="hamburger-line"></div>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Mobile Navigation Menu -->
+    <div id="mobile-nav" class="fixed top-0 right-0 h-full w-64 glassmorphic z-30 pt-24 p-8 md:hidden">
+        <nav class="flex flex-col space-y-6 text-lg">
+            <a href="#home" class="text-gray-300 hover:neon-cyan transition-colors duration-300">Home</a>
+            <a href="#chatbot" class="text-gray-300 hover:neon-cyan transition-colors duration-300">Chatbot</a>
+            <a href="#features" class="text-gray-300 hover:neon-cyan transition-colors duration-300">Features</a>
+            <a href="#about" class="text-gray-300 hover:neon-cyan transition-colors duration-300">About</a>
+            <div id="auth-button-container-mobile" class="pt-4">
+                 <button class="login-btn w-full px-5 py-2 bg-transparent border-2 neon-cyan-border rounded-full text-white font-semibold">Login</button>
+                 <button class="logout-btn hidden w-full px-5 py-2 bg-red-500 border-2 border-red-500 rounded-full text-white font-semibold">Logout</button>
+            </div>
+        </nav>
+    </div>
+
+    <main>
+        <!-- Hero Section -->
+        <section id="home" class="min-h-screen flex items-center justify-center text-center relative overflow-hidden">
+            <div class="container mx-auto px-6 z-10">
+                <h1 class="text-5xl md:text-7xl font-extrabold text-white leading-tight mb-4 reveal">
+                    Intelligent Conversations<br>Powered by <span class="neon-cyan">NexusAI</span>
+                </h1>
+                <p class="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-8 reveal" style="transition-delay: 0.2s;">
+                    Experience the future of communication. Our advanced AI understands context, learns from interactions, and provides human-like responses.
+                </p>
+                <div class="relative inline-block reveal requires-auth" style="transition-delay: 0.4s;">
+                    <a href="#chatbot" class="relative z-10 inline-block px-8 py-4 bg-cyan-500 text-black font-bold rounded-full text-lg transform hover:scale-105 hover:neon-cyan-shadow transition-all duration-300">
+                        Start Chatting
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Chatbot Interface Section (Gated) -->
+        <section id="chatbot" class="py-20 md:py-32 hidden">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12 reveal">
+                    <h2 class="text-4xl md:text-5xl font-bold text-white">Meet <span class="neon-cyan">Your AI Companion</span></h2>
+                    <p class="text-gray-400 mt-4 max-w-2xl mx-auto">
+                        Your conversation is saved locally. You can clear it at any time.
+                    </p>
+                </div>
+                
+                <div class="max-w-4xl mx-auto glassmorphic rounded-2xl shadow-2xl overflow-hidden reveal">
+                    <div id="chat-history" class="h-96 p-6 flex flex-col overflow-y-auto space-y-4">
+                        <!-- Chat messages will be populated by JS -->
+                    </div>
+                    <div id="typing-indicator" class="px-6 py-2 hidden">
+                        <div class="chat-bubble ai !py-3">
+                           <div class="typing-indicator"><span></span><span></span><span></span></div>
+                        </div>
+                    </div>
+                    <div class="p-4 border-t border-gray-700">
+                        <form id="chat-form" class="flex items-center space-x-2 md:space-x-4">
+                            <input type="text" id="chat-input" placeholder="Type your message here..." autocomplete="off" class="flex-grow min-w-0 bg-gray-800 text-white rounded-full py-3 px-5 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all">
+                            <button type="button" id="clear-chat-btn" title="Clear Chat History" class="flex-shrink-0 bg-yellow-500 text-black rounded-full p-3 transform hover:scale-110 transition-all duration-300">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                            </button>
+                            <button type="submit" title="Send Message" class="flex-shrink-0 bg-cyan-500 text-black rounded-full p-3 transform hover:scale-110 hover:neon-cyan-shadow transition-all duration-300">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="py-20 md:py-24 bg-black bg-opacity-20">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16 reveal">
+                    <h2 class="text-4xl md:text-5xl font-bold text-white">Advanced <span class="neon-cyan">Capabilities</span></h2>
+                    <p class="text-gray-400 mt-4 max-w-2xl mx-auto">
+                        NexusAI Conversa is packed with features designed for a seamless and powerful conversational experience.
+                    </p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="glassmorphic p-8 rounded-2xl transition-all duration-300 hover:border-cyan-400 hover:-translate-y-2 reveal">
+                        <h3 class="text-2xl font-bold text-white mb-2">Real-time Responses</h3>
+                        <p class="text-gray-400">Get instant, intelligent answers with our low-latency infrastructure and optimized AI models.</p>
+                    </div>
+                    <div class="glassmorphic p-8 rounded-2xl transition-all duration-300 hover:border-cyan-400 hover:-translate-y-2 reveal" style="transition-delay: 0.2s;">
+                        <h3 class="text-2xl font-bold text-white mb-2">Persistent Chat</h3>
+                        <p class="text-gray-400">Your chat history is saved to your local device, so you can pick up where you left off anytime.</p>
+                    </div>
+                    <div class="glassmorphic p-8 rounded-2xl transition-all duration-300 hover:border-cyan-400 hover:-translate-y-2 reveal" style="transition-delay: 0.4s;">
+                        <h3 class="text-2xl font-bold text-white mb-2">Secure & Private</h3>
+                        <p class="text-gray-400">Your conversations are your own. We prioritize user privacy with a secure login system.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="py-20 md:py-32">
+            <div class="container mx-auto px-6 flex flex-col md:flex-row items-center gap-12">
+                <div class="md:w-1/2 reveal">
+                    <h2 class="text-4xl md:text-5xl font-bold text-white mb-4">About The <span class="neon-cyan">Project</span></h2>
+                    <p class="text-gray-400">Built with HTML5, Tailwind CSS, and vanilla JavaScript, it leverages hybrid animations and communicates directly with the Google Gemini API to bring state-of-the-art AI to your fingertips.</p>
+                </div>
+                <div class="md:w-1/2 reveal" style="transition-delay: 0.2s;">
+                    <div class="glassmorphic p-8 rounded-2xl">
+                        <h4 class="text-2xl font-bold text-white mb-4">Tech Stack</h4>
+                        <ul class="space-y-3">
+                            <li class="flex items-center"><span class="neon-cyan-bg h-2 w-2 rounded-full mr-3"></span>HTML5, CSS3, JS (ES6+)</li>
+                            <li class="flex items-center"><span class="neon-cyan-bg h-2 w-2 rounded-full mr-3"></span>Tailwind CSS</li>
+                            <li class="flex items-center"><span class="neon-cyan-bg h-2 w-2 rounded-full mr-3"></span>Google Gemini API</li>
+                            <li class="flex items-center"><span class="neon-cyan-bg h-2 w-2 rounded-full mr-3"></span>localStorage for Auth & Chat</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="bg-black bg-opacity-40 border-t border-gray-800 py-8">
+        <div class="container mx-auto px-6 text-center text-gray-500">
+            <p>&copy; 2024 NexusAI Conversa. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script type="module">
+        // The API Key is no longer stored here for security.
+        // The frontend now calls our own secure API endpoint.
+        const API_URL = '/api/chat'; 
+        
+        // --- Particle Background Animation ---
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        let particlesArray;
+
+        class Particle {
+            constructor(x, y, dX, dY, size) {
+                this.x = x; this.y = y; this.directionX = dX; this.directionY = dY; this.size = size;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                ctx.fillStyle = 'rgba(0, 255, 255, 0.5)';
+                ctx.fill();
+            }
+            update() {
+                if (this.x > canvas.width || this.x < 0) this.directionX = -this.directionX;
+                if (this.y > canvas.height || this.y < 0) this.directionY = -this.directionY;
+                this.x += this.directionX;
+                this.y += this.directionY;
+                this.draw();
+            }
+        }
+
+        function initParticles() {
+            particlesArray = [];
+            let num = (canvas.height * canvas.width) / 9000;
+            for (let i = 0; i < num; i++) {
+                let size = (Math.random() * 2) + 1;
+                let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
+                let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
+                let dX = (Math.random() * .4) - .2;
+                let dY = (Math.random() * .4) - .2;
+                particlesArray.push(new Particle(x, y, dX, dY, size));
+            }
+        }
+
+        function animateParticles() {
+            requestAnimationFrame(animateParticles);
+            ctx.clearRect(0, 0, innerWidth, innerHeight);
+            particlesArray.forEach(p => p.update());
+        }
+        
+        window.addEventListener('resize', () => { canvas.width = innerWidth; canvas.height = innerHeight; initParticles(); });
+        initParticles();
+        animateParticles();
+
+        // --- Main Application Logic ---
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            const loginModal = document.getElementById('login-modal');
+            const loginForm = document.getElementById('login-form');
+            const loginError = document.getElementById('login-error');
+            const confirmModal = document.getElementById('confirm-modal');
+            const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
+            const confirmActionBtn = document.getElementById('confirm-action-btn');
+            const hamburgerButton = document.getElementById('hamburger-button');
+            const mobileNav = document.getElementById('mobile-nav');
+            const chatForm = document.getElementById('chat-form');
+            const chatInput = document.getElementById('chat-input');
+            const chatHistoryEl = document.getElementById('chat-history');
+            const typingIndicator = document.getElementById('typing-indicator');
+            const clearChatBtn = document.getElementById('clear-chat-btn');
+
+            let conversationHistory = [];
+
+            // --- Authentication System ---
+            const checkAuth = () => {
+                if (localStorage.getItem('nexusai_token') === 'true') {
+                    document.body.classList.add('authenticated');
+                    loginModal.style.display = 'none';
+                    loadChatHistory();
+                } else {
+                    document.body.classList.remove('authenticated');
+                    loginModal.style.display = 'flex';
+                }
+            };
+
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                if (username === 'demo' && password === 'password123') {
+                    localStorage.setItem('nexusai_token', 'true');
+                    checkAuth();
+                } else {
+                    loginError.textContent = 'Invalid credentials. Please try again.';
+                    setTimeout(() => loginError.textContent = '', 3000);
+                }
+            });
+
+            document.querySelectorAll('.logout-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    localStorage.removeItem('nexusai_token');
+                    localStorage.removeItem('nexusai_chatHistory');
+                    location.reload();
+                });
+            });
+            
+            document.querySelectorAll('.login-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                     loginModal.style.display = 'flex';
+                });
+            });
+
+            // --- Mobile Navigation ---
+            hamburgerButton.addEventListener('click', () => {
+                hamburgerButton.classList.toggle('active');
+                mobileNav.classList.toggle('active');
+            });
+
+            document.querySelectorAll('#mobile-nav a').forEach(link => {
+                link.addEventListener('click', () => {
+                    hamburgerButton.classList.remove('active');
+                    mobileNav.classList.remove('active');
+                });
+            });
+
+            // --- General UI ---
+            const header = document.getElementById('main-header');
+            window.addEventListener('scroll', () => {
+                header.classList.toggle('header-scrolled', window.scrollY > 50);
+            });
+
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
+                });
+            });
+
+            const revealElements = document.querySelectorAll('.reveal');
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.classList.add('visible');
+                });
+            }, { threshold: 0.1 });
+            revealElements.forEach(el => revealObserver.observe(el));
+
+            // --- Chatbot Logic ---
+            const addMessageToUI = (message, sender) => {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('chat-bubble', sender);
+                messageElement.textContent = message;
+                chatHistoryEl.appendChild(messageElement);
+                chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
+            };
+
+            const saveChatHistory = () => {
+                localStorage.setItem('nexusai_chatHistory', JSON.stringify(conversationHistory));
+            };
+
+            const loadChatHistory = () => {
+                const savedHistory = localStorage.getItem('nexusai_chatHistory');
+                chatHistoryEl.innerHTML = ''; // Clear previous UI
+                if (savedHistory) {
+                    conversationHistory = JSON.parse(savedHistory);
+                    conversationHistory.forEach(msg => addMessageToUI(msg.parts[0].text, msg.role === 'user' ? 'user' : 'ai'));
+                } else {
+                    addMessageToUI("Hello! I'm NexusAI Conversa. How can I help you today?", 'ai');
+                }
+            };
+            
+            clearChatBtn.addEventListener('click', () => {
+                confirmModal.classList.remove('hidden');
+                confirmModal.classList.add('flex');
+            });
+
+            confirmCancelBtn.addEventListener('click', () => {
+                confirmModal.classList.add('hidden');
+                confirmModal.classList.remove('flex');
+            });
+
+            confirmActionBtn.addEventListener('click', () => {
+                conversationHistory = [];
+                localStorage.removeItem('nexusai_chatHistory');
+                loadChatHistory();
+                confirmModal.classList.add('hidden');
+                confirmModal.classList.remove('flex');
+            });
+
+            chatForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const userInput = chatInput.value.trim();
+                if (!userInput) return;
+
+                addMessageToUI(userInput, 'user');
+                conversationHistory.push({ role: "user", parts: [{ text: userInput }] });
+                saveChatHistory();
+                chatInput.value = '';
+
+                typingIndicator.style.display = 'block';
+                chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
+
+                try {
+                    const payload = { contents: conversationHistory };
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload),
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || 'An unknown error occurred on the server.');
+                    }
+
+                    const data = await response.json();
+                    if (data.aiResponse) {
+                        const aiResponse = data.aiResponse;
+                        addMessageToUI(aiResponse, 'ai');
+                        conversationHistory.push({ role: "model", parts: [{ text: aiResponse }] });
+                        saveChatHistory();
+                    } else {
+                        throw new Error('Invalid response from server.');
+                    }
+                } catch (error) {
+                    console.error('Error fetching AI response:', error);
+                    addMessageToUI(`Sorry, an error occurred: ${error.message}`, 'ai');
+                } finally {
+                    typingIndicator.style.display = 'none';
+                    chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
+                }
+            });
+
+            // Initial check
+            checkAuth();
+        });
+    </script>
+</body>
+</html>
