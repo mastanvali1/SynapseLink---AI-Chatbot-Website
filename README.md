@@ -2,7 +2,7 @@
 
 A stunning, futuristic AI chatbot built with a glassmorphic design and powered by Google's Gemini API. Secure, responsive, and animated for a premium user experience.
 
-[![Deploy with Vercel](https://synapse-link-ai-chatbot.vercel.app/)]
+[![Deploy with Vercel](https://vercel.com/button)](https://synapse-link-ai-chatbot.vercel.app/)
 
 ---
 
@@ -67,7 +67,7 @@ Deploy your own version of SynapseLink with one click.
 >
 > **Go to:** `Vercel Dashboard` -> `Your Project` -> `Settings` -> `Environment Variables`
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fyour-username%2Fyour-repo-name)
+[![Deploy with Vercel](https://vercel.com/button)](https://synapse-link-ai-chatbot.vercel.app/)
 
 ---
 
