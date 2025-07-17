@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexusAI Conversa - Intelligent AI Chatbot</title>
-    <meta name="description" content="Engage in intelligent conversations with NexusAI Conversa, a futuristic chatbot powered by Google's Gemini AI.">
-    <meta name="keywords" content="AI, chatbot, NexusAI, Conversa, Gemini, Google AI, machine learning, conversational AI">
+    <title>SynapseLink - Your AI Conversation Partner</title>
+    <meta name="description" content="Engage in intelligent conversations with SynapseLink, a futuristic chatbot powered by Google's Gemini AI.">
+    <meta name="keywords" content="AI, chatbot, SynapseLink, Gemini, Google AI, machine learning, conversational AI">
     
     <!-- Favicon -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg width='100' height='100' viewBox='0 0 100 100' fill='none' xmlns='http://www.w3.org/2000/svg'><circle cx='50' cy='50' r='10' fill='%2300FFFF'/><path d='M50 50 L20 20 M50 50 L20 80 M50 50 L80 20 M50 50 L80 80' stroke='%2300FFFF' stroke-width='6'/></svg>">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -26,6 +26,102 @@
             background-color: #0a0f1f; /* Deep blue dark background */
             color: #e0e0e0;
             overflow-x: hidden;
+        }
+
+        /* Preloader Styles */
+        #preloader {
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+        }
+        #preloader.hidden {
+            opacity: 0;
+            transform: scale(1.5);
+            pointer-events: none;
+        }
+        .tech-loader {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            animation: rotate-loader 8s linear infinite;
+        }
+        .tech-loader .dot {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background-color: #00FFFF;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #00FFFF;
+            opacity: 0;
+            animation: fade-in-dot 1.5s forwards;
+        }
+        .tech-loader .center-dot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 16px;
+            height: 16px;
+            background-color: #fff;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 15px #fff, 0 0 25px #00FFFF;
+            z-index: 10;
+        }
+        .tech-loader .dot-1 { top: 0; left: 50%; transform: translateX(-50%); animation-delay: 0.2s; }
+        .tech-loader .dot-2 { top: 50%; right: 0; transform: translateY(-50%); animation-delay: 0.4s; }
+        .tech-loader .dot-3 { bottom: 0; left: 50%; transform: translateX(-50%); animation-delay: 0.6s; }
+        .tech-loader .dot-4 { top: 50%; left: 0; transform: translateY(-50%); animation-delay: 0.8s; }
+
+        .tech-loader .line {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 2px;
+            height: 50%;
+            background: linear-gradient(to top, transparent, #00FFFF);
+            transform-origin: top;
+            opacity: 0;
+        }
+        .tech-loader .line-1 { transform: rotate(0deg) scaleY(0); animation: draw-line-1 0.5s forwards 1s; }
+        .tech-loader .line-2 { transform: rotate(90deg) scaleY(0); animation: draw-line-2 0.5s forwards 1.2s; }
+        .tech-loader .line-3 { transform: rotate(180deg) scaleY(0); animation: draw-line-3 0.5s forwards 1.4s; }
+        .tech-loader .line-4 { transform: rotate(270deg) scaleY(0); animation: draw-line-4 0.5s forwards 1.6s; }
+
+        @keyframes rotate-loader { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes fade-in-dot { to { opacity: 1; } }
+        @keyframes draw-line-1 { to { transform: rotate(0deg) scaleY(1); opacity: 1; } }
+        @keyframes draw-line-2 { to { transform: rotate(90deg) scaleY(1); opacity: 1; } }
+        @keyframes draw-line-3 { to { transform: rotate(180deg) scaleY(1); opacity: 1; } }
+        @keyframes draw-line-4 { to { transform: rotate(270deg) scaleY(1); opacity: 1; } }
+
+        /* Login Modal Animation */
+        #login-modal {
+            display: flex;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease-out;
+        }
+        #login-modal.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        #login-modal .glassmorphic {
+            transform: scale(0.95) translateY(10px);
+            opacity: 0;
+            transition: transform 0.4s 0.1s ease-out, opacity 0.4s 0.1s ease-out;
+        }
+        #login-modal.visible .glassmorphic {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+        }
+
+        /* Main content animation */
+        #main-content {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        #main-content.loaded {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         /* Animated background canvas */
@@ -141,11 +237,26 @@
 </head>
 <body class="antialiased">
 
+    <!-- Preloader -->
+    <div id="preloader" class="fixed inset-0 bg-[#0a0f1f] flex items-center justify-center z-[100]">
+        <div class="tech-loader">
+            <div class="center-dot"></div>
+            <div class="dot dot-1"></div>
+            <div class="dot dot-2"></div>
+            <div class="dot dot-3"></div>
+            <div class="dot dot-4"></div>
+            <div class="line line-1"></div>
+            <div class="line line-2"></div>
+            <div class="line line-3"></div>
+            <div class="line line-4"></div>
+        </div>
+    </div>
+
     <!-- Login Modal -->
     <div id="login-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
         <div class="glassmorphic p-8 rounded-2xl w-full max-w-sm text-center">
             <h2 class="text-3xl font-bold text-white mb-2">Welcome Back</h2>
-            <p class="text-gray-400 mb-6">Login to access NexusAI Conversa</p>
+            <p class="text-gray-400 mb-6">Login to access SynapseLink</p>
             <form id="login-form">
                 <input type="text" id="username" placeholder="Username (hint: demo)" class="w-full bg-gray-800 text-white rounded-full py-3 px-5 mb-4 focus:outline-none focus:ring-2 focus:ring-cyan-500">
                 <input type="password" id="password" placeholder="Password (hint: password123)" class="w-full bg-gray-800 text-white rounded-full py-3 px-5 mb-6 focus:outline-none focus:ring-2 focus:ring-cyan-500">
@@ -176,7 +287,7 @@
     <header id="main-header" class="fixed top-0 left-0 right-0 z-40 transition-all duration-300 glassmorphic">
         <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
             <div class="text-2xl font-bold text-white tracking-wider">
-                NexusAI<span class="neon-cyan">Conversa</span>
+                Synapse<span class="neon-cyan">Link</span>
             </div>
             <div class="hidden md:flex items-center space-x-8">
                 <a href="#home" class="text-gray-300 hover:neon-cyan transition-colors duration-300">Home</a>
@@ -213,120 +324,142 @@
         </nav>
     </div>
 
-    <main>
-        <!-- Hero Section -->
-        <section id="home" class="min-h-screen flex items-center justify-center text-center relative overflow-hidden">
-            <div class="container mx-auto px-6 z-10">
-                <h1 class="text-5xl md:text-7xl font-extrabold text-white leading-tight mb-4 reveal">
-                    Intelligent Conversations<br>Powered by <span class="neon-cyan">NexusAI</span>
-                </h1>
-                <p class="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-8 reveal" style="transition-delay: 0.2s;">
-                    Experience the future of communication. Our advanced AI understands context, learns from interactions, and provides human-like responses.
-                </p>
-                <div class="relative inline-block reveal requires-auth" style="transition-delay: 0.4s;">
-                    <a href="#chatbot" class="relative z-10 inline-block px-8 py-4 bg-cyan-500 text-black font-bold rounded-full text-lg transform hover:scale-105 hover:neon-cyan-shadow transition-all duration-300">
-                        Start Chatting
-                    </a>
-                </div>
-            </div>
-        </section>
-
-        <!-- Chatbot Interface Section (Gated) -->
-        <section id="chatbot" class="py-20 md:py-32 hidden">
-            <div class="container mx-auto px-6">
-                <div class="text-center mb-12 reveal">
-                    <h2 class="text-4xl md:text-5xl font-bold text-white">Meet <span class="neon-cyan">Your AI Companion</span></h2>
-                    <p class="text-gray-400 mt-4 max-w-2xl mx-auto">
-                        Your conversation is saved locally. You can clear it at any time.
+    <div id="main-content">
+        <main>
+            <!-- Hero Section -->
+            <section id="home" class="min-h-screen flex items-center justify-center text-center relative overflow-hidden px-4">
+                <div class="container mx-auto z-10">
+                    <h1 class="text-4xl sm:text-5xl md:text-7xl font-extrabold text-white leading-tight mb-4 reveal">
+                        Intelligent Conversations<br>Powered by <span class="neon-cyan">SynapseLink</span>
+                    </h1>
+                    <p class="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-8 reveal" style="transition-delay: 0.2s;">
+                        Experience the future of communication. Our advanced AI understands context, learns from interactions, and provides human-like responses.
                     </p>
-                </div>
-                
-                <div class="max-w-4xl mx-auto glassmorphic rounded-2xl shadow-2xl overflow-hidden reveal">
-                    <div id="chat-history" class="h-96 p-6 flex flex-col overflow-y-auto space-y-4">
-                        <!-- Chat messages will be populated by JS -->
+                    <div class="relative inline-block reveal requires-auth" style="transition-delay: 0.4s;">
+                        <a href="#chatbot" class="relative z-10 inline-block px-8 py-4 bg-cyan-500 text-black font-bold rounded-full text-lg transform hover:scale-105 hover:neon-cyan-shadow transition-all duration-300">
+                            Start Chatting
+                        </a>
                     </div>
-                    <div id="typing-indicator" class="px-6 py-2 hidden">
-                        <div class="chat-bubble ai !py-3">
-                           <div class="typing-indicator"><span></span><span></span><span></span></div>
+                </div>
+            </section>
+
+            <!-- Chatbot Interface Section (Gated) -->
+            <section id="chatbot" class="py-16 md:py-24 hidden">
+                <div class="container mx-auto px-4">
+                    <div class="text-center mb-12 reveal">
+                        <h2 class="text-3xl md:text-5xl font-bold text-white">Meet <span class="neon-cyan">Your AI Companion</span></h2>
+                        <p class="text-gray-400 mt-4 max-w-2xl mx-auto">
+                            Your conversation is saved locally. You can clear it at any time.
+                        </p>
+                    </div>
+                    
+                    <div class="max-w-4xl mx-auto glassmorphic rounded-2xl shadow-2xl overflow-hidden reveal">
+                        <div id="chat-history" class="h-96 p-4 md:p-6 flex flex-col overflow-y-auto space-y-4">
+                            <!-- Chat messages will be populated by JS -->
+                        </div>
+                        <div id="typing-indicator" class="px-4 md:px-6 py-2 hidden">
+                            <div class="chat-bubble ai !py-3">
+                               <div class="typing-indicator"><span></span><span></span><span></span></div>
+                            </div>
+                        </div>
+                        <div class="p-4 border-t border-gray-700">
+                            <form id="chat-form" class="flex items-center space-x-2 md:space-x-4">
+                                <input type="text" id="chat-input" placeholder="Type your message..." autocomplete="off" class="flex-grow min-w-0 bg-gray-800 text-white rounded-full py-3 px-5 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all">
+                                <button type="button" id="clear-chat-btn" title="Clear Chat History" class="flex-shrink-0 bg-yellow-500 text-black rounded-full p-3 transform hover:scale-110 transition-all duration-300">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                </button>
+                                <button type="submit" title="Send Message" class="flex-shrink-0 bg-cyan-500 text-black rounded-full p-3 transform hover:scale-110 hover:neon-cyan-shadow transition-all duration-300">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                                    </svg>
+                                </button>
+                            </form>
                         </div>
                     </div>
-                    <div class="p-4 border-t border-gray-700">
-                        <form id="chat-form" class="flex items-center space-x-2 md:space-x-4">
-                            <input type="text" id="chat-input" placeholder="Type your message here..." autocomplete="off" class="flex-grow min-w-0 bg-gray-800 text-white rounded-full py-3 px-5 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all">
-                            <button type="button" id="clear-chat-btn" title="Clear Chat History" class="flex-shrink-0 bg-yellow-500 text-black rounded-full p-3 transform hover:scale-110 transition-all duration-300">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                            </button>
-                            <button type="submit" title="Send Message" class="flex-shrink-0 bg-cyan-500 text-black rounded-full p-3 transform hover:scale-110 hover:neon-cyan-shadow transition-all duration-300">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
-                                </svg>
-                            </button>
-                        </form>
-                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <!-- Features Section -->
-        <section id="features" class="py-20 md:py-24 bg-black bg-opacity-20">
-            <div class="container mx-auto px-6">
-                <div class="text-center mb-16 reveal">
-                    <h2 class="text-4xl md:text-5xl font-bold text-white">Advanced <span class="neon-cyan">Capabilities</span></h2>
-                    <p class="text-gray-400 mt-4 max-w-2xl mx-auto">
-                        NexusAI Conversa is packed with features designed for a seamless and powerful conversational experience.
-                    </p>
+            <!-- Features Section -->
+            <section id="features" class="py-16 md:py-24 bg-black bg-opacity-20">
+                <div class="container mx-auto px-4">
+                    <div class="text-center mb-12 md:mb-16 reveal">
+                        <h2 class="text-3xl md:text-5xl font-bold text-white">Advanced <span class="neon-cyan">Capabilities</span></h2>
+                        <p class="text-gray-400 mt-4 max-w-2xl mx-auto">
+                            SynapseLink is packed with features designed for a seamless and powerful conversational experience.
+                        </p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <div class="glassmorphic p-8 rounded-2xl transition-all duration-300 hover:border-cyan-400 hover:-translate-y-2 reveal">
+                            <h3 class="text-2xl font-bold text-white mb-2">Real-time Responses</h3>
+                            <p class="text-gray-400">Get instant, intelligent answers with our low-latency infrastructure and optimized AI models.</p>
+                        </div>
+                        <div class="glassmorphic p-8 rounded-2xl transition-all duration-300 hover:border-cyan-400 hover:-translate-y-2 reveal" style="transition-delay: 0.2s;">
+                            <h3 class="text-2xl font-bold text-white mb-2">Persistent Chat</h3>
+                            <p class="text-gray-400">Your chat history is saved to your local device, so you can pick up where you left off anytime.</p>
+                        </div>
+                        <div class="glassmorphic p-8 rounded-2xl transition-all duration-300 hover:border-cyan-400 hover:-translate-y-2 reveal" style="transition-delay: 0.4s;">
+                            <h3 class="text-2xl font-bold text-white mb-2">Secure & Private</h3>
+                            <p class="text-gray-400">Your conversations are your own. We prioritize user privacy with a secure login system.</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <div class="glassmorphic p-8 rounded-2xl transition-all duration-300 hover:border-cyan-400 hover:-translate-y-2 reveal">
-                        <h3 class="text-2xl font-bold text-white mb-2">Real-time Responses</h3>
-                        <p class="text-gray-400">Get instant, intelligent answers with our low-latency infrastructure and optimized AI models.</p>
-                    </div>
-                    <div class="glassmorphic p-8 rounded-2xl transition-all duration-300 hover:border-cyan-400 hover:-translate-y-2 reveal" style="transition-delay: 0.2s;">
-                        <h3 class="text-2xl font-bold text-white mb-2">Persistent Chat</h3>
-                        <p class="text-gray-400">Your chat history is saved to your local device, so you can pick up where you left off anytime.</p>
-                    </div>
-                    <div class="glassmorphic p-8 rounded-2xl transition-all duration-300 hover:border-cyan-400 hover:-translate-y-2 reveal" style="transition-delay: 0.4s;">
-                        <h3 class="text-2xl font-bold text-white mb-2">Secure & Private</h3>
-                        <p class="text-gray-400">Your conversations are your own. We prioritize user privacy with a secure login system.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
+            </section>
 
-        <!-- About Section -->
-        <section id="about" class="py-20 md:py-32">
-            <div class="container mx-auto px-6 flex flex-col md:flex-row items-center gap-12">
-                <div class="md:w-1/2 reveal">
-                    <h2 class="text-4xl md:text-5xl font-bold text-white mb-4">About The <span class="neon-cyan">Project</span></h2>
-                    <p class="text-gray-400">Built with HTML5, Tailwind CSS, and vanilla JavaScript, it leverages hybrid animations and communicates directly with the Google Gemini API to bring state-of-the-art AI to your fingertips.</p>
-                </div>
-                <div class="md:w-1/2 reveal" style="transition-delay: 0.2s;">
-                    <div class="glassmorphic p-8 rounded-2xl">
-                        <h4 class="text-2xl font-bold text-white mb-4">Tech Stack</h4>
-                        <ul class="space-y-3">
-                            <li class="flex items-center"><span class="neon-cyan-bg h-2 w-2 rounded-full mr-3"></span>HTML5, CSS3, JS (ES6+)</li>
-                            <li class="flex items-center"><span class="neon-cyan-bg h-2 w-2 rounded-full mr-3"></span>Tailwind CSS</li>
-                            <li class="flex items-center"><span class="neon-cyan-bg h-2 w-2 rounded-full mr-3"></span>Google Gemini API</li>
-                            <li class="flex items-center"><span class="neon-cyan-bg h-2 w-2 rounded-full mr-3"></span>localStorage for Auth & Chat</li>
-                        </ul>
+            <!-- About Section -->
+            <section id="about" class="py-16 md:py-24">
+                <div class="container mx-auto px-4 flex flex-col md:flex-row items-center gap-12">
+                    <div class="md:w-1/2 reveal">
+                        <h2 class="text-3xl md:text-5xl font-bold text-white mb-4">About The <span class="neon-cyan">Project</span></h2>
+                        <p class="text-gray-400">Built with HTML5, Tailwind CSS, and vanilla JavaScript, it leverages hybrid animations and communicates directly with the Google Gemini API to bring state-of-the-art AI to your fingertips.</p>
+                    </div>
+                    <div class="md:w-1/2 reveal" style="transition-delay: 0.2s;">
+                        <div class="glassmorphic p-8 rounded-2xl">
+                            <h4 class="text-2xl font-bold text-white mb-4">Tech Stack</h4>
+                            <ul class="space-y-3">
+                                <li class="flex items-center"><span class="neon-cyan-bg h-2 w-2 rounded-full mr-3"></span>HTML5, CSS3, JS (ES6+)</li>
+                                <li class="flex items-center"><span class="neon-cyan-bg h-2 w-2 rounded-full mr-3"></span>Tailwind CSS</li>
+                                <li class="flex items-center"><span class="neon-cyan-bg h-2 w-2 rounded-full mr-3"></span>Google Gemini API</li>
+                                <li class="flex items-center"><span class="neon-cyan-bg h-2 w-2 rounded-full mr-3"></span>localStorage for Auth & Chat</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
-    </main>
+            </section>
+        </main>
 
-    <!-- Footer Section -->
-    <footer class="bg-black bg-opacity-40 border-t border-gray-800 py-8">
-        <div class="container mx-auto px-6 text-center text-gray-500">
-            <p>&copy; 2024 NexusAI Conversa. All Rights Reserved.</p>
-        </div>
-    </footer>
+        <!-- Footer Section -->
+        <footer class="bg-black bg-opacity-40 border-t border-gray-800 py-8">
+            <div class="container mx-auto px-4 text-center text-gray-500">
+                <p>&copy; 2024 SynapseLink. All Rights Reserved.</p>
+            </div>
+        </footer>
+    </div>
 
     <script type="module">
         // The API Key is no longer stored here for security.
         // The frontend now calls our own secure API endpoint.
         const API_URL = '/api/chat'; 
         
+        const preloader = document.getElementById('preloader');
+        const mainContent = document.getElementById('main-content');
+        const loginModal = document.getElementById('login-modal');
+
+        // --- Preloader and Initial Animation Logic ---
+        setTimeout(() => {
+            preloader.classList.add('hidden');
+            
+            // After preloader fades, decide what to show
+            if (localStorage.getItem('synapselink_token') === 'true') {
+                mainContent.classList.add('loaded'); // Animate in main content
+            } else {
+                loginModal.classList.add('visible'); // Animate in login modal
+            }
+
+            setTimeout(() => {
+                preloader.style.display = 'none';
+            }, 500); // Match CSS transition duration
+        }, 2500); // 2.5 seconds
+
         // --- Particle Background Animation ---
         const canvas = document.getElementById('particle-canvas');
         const ctx = canvas.getContext('2d');
@@ -379,7 +512,6 @@
         // --- Main Application Logic ---
         document.addEventListener('DOMContentLoaded', () => {
             
-            const loginModal = document.getElementById('login-modal');
             const loginForm = document.getElementById('login-form');
             const loginError = document.getElementById('login-error');
             const confirmModal = document.getElementById('confirm-modal');
@@ -397,13 +529,12 @@
 
             // --- Authentication System ---
             const checkAuth = () => {
-                if (localStorage.getItem('nexusai_token') === 'true') {
+                if (localStorage.getItem('synapselink_token') === 'true') {
                     document.body.classList.add('authenticated');
-                    loginModal.style.display = 'none';
+                    loginModal.classList.remove('visible');
                     loadChatHistory();
                 } else {
                     document.body.classList.remove('authenticated');
-                    loginModal.style.display = 'flex';
                 }
             };
 
@@ -412,8 +543,15 @@
                 const username = document.getElementById('username').value;
                 const password = document.getElementById('password').value;
                 if (username === 'demo' && password === 'password123') {
-                    localStorage.setItem('nexusai_token', 'true');
-                    checkAuth();
+                    localStorage.setItem('synapselink_token', 'true');
+                    
+                    // Animate out login modal and animate in main content
+                    loginModal.classList.remove('visible');
+                    setTimeout(() => {
+                        checkAuth();
+                        mainContent.classList.add('loaded');
+                    }, 500); // Wait for fade out to finish
+
                 } else {
                     loginError.textContent = 'Invalid credentials. Please try again.';
                     setTimeout(() => loginError.textContent = '', 3000);
@@ -422,15 +560,15 @@
 
             document.querySelectorAll('.logout-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    localStorage.removeItem('nexusai_token');
-                    localStorage.removeItem('nexusai_chatHistory');
+                    localStorage.removeItem('synapselink_token');
+                    localStorage.removeItem('synapselink_chatHistory');
                     location.reload();
                 });
             });
             
             document.querySelectorAll('.login-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
-                     loginModal.style.display = 'flex';
+                     loginModal.classList.add('visible');
                 });
             });
 
@@ -478,17 +616,17 @@
             };
 
             const saveChatHistory = () => {
-                localStorage.setItem('nexusai_chatHistory', JSON.stringify(conversationHistory));
+                localStorage.setItem('synapselink_chatHistory', JSON.stringify(conversationHistory));
             };
 
             const loadChatHistory = () => {
-                const savedHistory = localStorage.getItem('nexusai_chatHistory');
+                const savedHistory = localStorage.getItem('synapselink_chatHistory');
                 chatHistoryEl.innerHTML = ''; // Clear previous UI
                 if (savedHistory) {
                     conversationHistory = JSON.parse(savedHistory);
                     conversationHistory.forEach(msg => addMessageToUI(msg.parts[0].text, msg.role === 'user' ? 'user' : 'ai'));
                 } else {
-                    addMessageToUI("Hello! I'm NexusAI Conversa. How can I help you today?", 'ai');
+                    addMessageToUI("Hello! I'm SynapseLink. How can I help you today?", 'ai');
                 }
             };
             
@@ -504,7 +642,7 @@
 
             confirmActionBtn.addEventListener('click', () => {
                 conversationHistory = [];
-                localStorage.removeItem('nexusai_chatHistory');
+                localStorage.removeItem('synapselink_chatHistory');
                 loadChatHistory();
                 confirmModal.classList.add('hidden');
                 confirmModal.classList.remove('flex');
@@ -554,7 +692,7 @@
                 }
             });
 
-            // Initial check
+            // Initial auth check to set the state before animations
             checkAuth();
         });
     </script>
